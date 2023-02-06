@@ -1,6 +1,7 @@
 import './charInfo.scss'
+import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import MarvelService from '../../services/MarvelService'
+import useMarvelService from '../../services/MarvelService'
 
 import Spinner from '../spinner/spinner'
 import ErrorMessage from '../errorMessage/ErrorMessage'
@@ -8,42 +9,30 @@ import Skeleton from '../skeleton/Skeleton'
 
 const CharInfo = (props) => {
   const [char, setChar] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
 
-  const marvelService = new MarvelService()
+  const { loading, error, getCharacter, clearError } = useMarvelService()
 
   useEffect(() => {
-    updateChar()
+    const updateChar = () => {
+      const { charId } = props
+      if (!charId) {
+        return
+      }
+
+      clearError()
+      getCharacter(charId).then(onCharLoaded)
+    }
+    updateChar() // eslint-disable-next-line
   }, [props.charId])
 
-  const updateChar = () => {
-    const { charId } = props
-    if (!charId) {
-      return
-    }
-    onCharLoading()
-
-    marvelService.getCharacter(charId).then(onCharLoaded).catch(onError)
-  }
- const onCharLoaded = (char) => {
+  const onCharLoaded = (char) => {
     setChar(char)
-    setLoading(false)
-  }
-
-  const onCharLoading = () => {
-    setLoading(true)
-  }
-
-  const onError = () => {
-    setLoading(false)
-    setError(true)
   }
 
   const skeleton = char || loading || error ? null : <Skeleton />
   const errorMessage = error ? <ErrorMessage /> : null
   const spinner = loading ? <Spinner /> : null
-  const content = !(loading || error || !char) ? <Viev char={char} /> : null
+  const content = !(loading || error || !char) ? <View char={char} /> : null
 
   return (
     <div className="char__info">
@@ -55,7 +44,7 @@ const CharInfo = (props) => {
   )
 }
 
-const Viev = ({ char }) => {
+const View = ({ char }) => {
   const { name, description, thumbnail, homepage, wiki, comics } = char
   return (
     <>
@@ -77,15 +66,20 @@ const Viev = ({ char }) => {
       <div className="char__comics">Comics:</div>
       <ul className="char__comics-list">
         {comics.length > 0 ? null : 'There is no comics this character'}
-        {comics.map((item, i) => {
-          // eslint-disable-next-line
-          if (i > 10) return
-          return (
-            <li key={i} className="char__comics-item">
-              {item.name}
-            </li>
-          )
-        })}
+        {// eslint-disable-next-line
+          comics.map((item, i) => {
+            if (i > 9)
+              return (
+                <Link
+                  to={`/comics/${item.resourceURI.split('comics/')[1]}`}
+                  key={item.resourceURI.split('comics/')[1]}
+                  className="char__comics-item"
+                >
+                  {item.name}
+                </Link>
+              )
+          })
+        }
       </ul>
     </>
   )
