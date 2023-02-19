@@ -2,7 +2,6 @@ import './charInfo.scss'
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import useMarvelService from '../../services/MarvelService'
-import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
 import Spinner from '../spinner/spinner'
 import ErrorMessage from '../errorMessage/ErrorMessage'
@@ -65,28 +64,24 @@ const View = ({ char }) => {
       </div>
       <div className="char__descr">{description}</div>
       <div className="char__comics">Comics:</div>
-      <TransitionGroup>
-        <ul className="char__comics-list">
-          {comics.length > 0 ? null : 'There is no comics this character'}
-          {
-            // eslint-disable-next-line
-            comics.map((item, i) => {
-              if (i > 9)
-                return (
-                  <CSSTransition timeout={300} classNames="char__comics-item">
-                    <Link
-                      to={`/comics/${item.resourceURI.split('comics/')[1]}`}
-                      key={item.resourceURI.split('comics/')[1]}
-                      className="char__comics-item"
-                    >
-                      {item.name}
-                    </Link>
-                  </CSSTransition>
-                )
-            })
-          }
-        </ul>
-      </TransitionGroup>
+      <ul className="char__comics-list">
+        {comics.length > 0 ? null : 'There is no comics this character'}
+        {
+          // eslint-disable-next-line
+          comics.map((item, i) => {
+            if (i > 9)
+              return (
+                <Link
+                  to={`/comics/${item.resourceURI.split('comics/')[1]}`}
+                  key={item.resourceURI.split('comics/')[1]}
+                  className="char__comics-item"
+                >
+                  {item.name}
+                </Link>
+              )
+          })
+        }
+      </ul>
     </>
   )
 }

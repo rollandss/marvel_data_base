@@ -59,12 +59,11 @@ const CharList = (props) => {
         imgStyle = { objectFit: 'unset' }
       }
       return (
-        <CSSTransition timeout={500} classNames="char__item">
+        <CSSTransition timeout={500} classNames="char__item" key={item.id}>
           <li
             className="char__item"
             tabIndex={0}
             ref={(el) => (itemRefs.current[i] = el)}
-            key={item.id}
             onClick={() => {
               props.onCharSelected(item.id)
               focusOnItem(i)
